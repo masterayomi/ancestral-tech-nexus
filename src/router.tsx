@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 // Layout component
 import AppContent from './App'
@@ -21,6 +21,7 @@ const ScalabilityStrategy = lazy(() => import('./components/ScalabilityStrategy'
 const AdminModule = lazy(() => import('./components/admin/AdminModule'))
 const AuthManagement = lazy(() => import('./components/AuthManagement'))
 const KnowledgeRepository = lazy(() => import('./components/KnowledgeRepository'))
+const ProfileEditor = lazy(() => import('./components/ProfileEditor'))
 
 // Loading fallback component
 function LoadingFallback() {
@@ -52,8 +53,22 @@ function RootLayout() {
   )
 }
 
+// Simple auth guard for routes that require authentication
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth()
+  if (loading) return <LoadingFallback />
+  if (!user) return <Navigate to="/profile" replace />
+  return <>{children}</>
+}
+
+function ProfileRoute() {
+  const { user, loading } = useAuth()
+  if (loading) return <LoadingFallback />
+  return user ? <RouteWrapper Component={ProfileEditor} /> : <RouteWrapper Component={AuthManagement} />
+}
+
 // Route definitions
-const routes: RouteObject[] = [
+const routes: RouteObject[] = [ 
   {
     path: '/',
     element: <RootLayout />,
@@ -65,7 +80,11 @@ const routes: RouteObject[] = [
       },
       {
         path: 'dashboard',
-        element: <RouteWrapper Component={lazy(() => import('./components/Dashboard'))} />,
+        element: (
+          <RequireAuth>
+            <RouteWrapper Component={lazy(() => import('./components/Dashboard'))} />
+          </RequireAuth>
+        ),
         children: [
           {
             index: true,
@@ -77,6 +96,7 @@ const routes: RouteObject[] = [
           },
         ],
       },
+
       {
         path: 'strategy',
         element: <RouteWrapper Component={StrategyDoc} />,
@@ -123,16 +143,24 @@ const routes: RouteObject[] = [
       },
       {
         path: 'admin',
-        element: <RouteWrapper Component={AdminModule} />,
+        element: (
+          <RequireAuth>
+            <RouteWrapper Component={AdminModule} />
+          </RequireAuth>
+        ),
       },
       {
         path: 'profile',
-        element: <RouteWrapper Component={AuthManagement} />,
+        element: <ProfileRoute />,
       },
       // Keep repository top-level for backward compat, but prefer /dashboard/repository
       {
         path: 'repository',
-        element: <RouteWrapper Component={KnowledgeRepository} />,
+        element: (
+          <RequireAuth>
+            <RouteWrapper Component={KnowledgeRepository} />
+          </RequireAuth>
+        ),
       },
     ],
   },
