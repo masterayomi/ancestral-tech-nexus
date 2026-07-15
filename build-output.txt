@@ -1,0 +1,89 @@
+
+> react-starter-template@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+Found 1 warning while optimizing generated CSS:
+
+│   }
+│ }
+│ @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+┆        ^-- @import rules must precede all rules aside from @charset and @layer statements
+┆
+│ :root {
+│   --background: oklch(1 0 0);
+
+[32m✓[39m 2246 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                                     [39m[1m[2m  1.90 kB[22m[1m[22m[2m │ gzip:   0.67 kB[22m
+[2mdist/[22m[35massets/index-BXKYGxjn.css                      [39m[1m[2m158.50 kB[22m[1m[22m[2m │ gzip:  23.95 kB[22m
+[2mdist/[22m[36massets/index-BdQq_4o_.js                       [39m[1m[2m  0.06 kB[22m[1m[22m[2m │ gzip:   0.08 kB[22m
+[2mdist/[22m[36massets/check-DCXf78Ys.js                       [39m[1m[2m  0.29 kB[22m[1m[22m[2m │ gzip:   0.24 kB[22m
+[2mdist/[22m[36massets/chevron-down-DoS_hfc7.js                [39m[1m[2m  0.30 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+[2mdist/[22m[36massets/chevron-right-CJinlL56.js               [39m[1m[2m  0.30 kB[22m[1m[22m[2m │ gzip:   0.25 kB[22m
+[2mdist/[22m[36massets/arrow-right-D6AAghzx.js                 [39m[1m[2m  0.34 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/search-pjJvhCTx.js                      [39m[1m[2m  0.34 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/circle-check-DHGtHcbi.js                [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/trending-up-C3ic3UJL.js                 [39m[1m[2m  0.35 kB[22m[1m[22m[2m │ gzip:   0.27 kB[22m
+[2mdist/[22m[36massets/circle-check-big-DNDgcx3I.js            [39m[1m[2m  0.36 kB[22m[1m[22m[2m │ gzip:   0.28 kB[22m
+[2mdist/[22m[36massets/lock-B5YuzYmj.js                        [39m[1m[2m  0.37 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+[2mdist/[22m[36massets/mic-fhi77-fw.js                         [39m[1m[2m  0.40 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/activity-ixRWSf6m.js                    [39m[1m[2m  0.41 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+[2mdist/[22m[36massets/globe-eOG6pQlD.js                       [39m[1m[2m  0.41 kB[22m[1m[22m[2m │ gzip:   0.29 kB[22m
+[2mdist/[22m[36massets/user-check-DUHuogCO.js                  [39m[1m[2m  0.41 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/link-2-BDvaDiAE.js                      [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/database-fFydctKS.js                    [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:   0.31 kB[22m
+[2mdist/[22m[36massets/circle-alert-D7wQDByE.js                [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+[2mdist/[22m[36massets/eye-ob4vrhaG.js                         [39m[1m[2m  0.42 kB[22m[1m[22m[2m │ gzip:   0.30 kB[22m
+[2mdist/[22m[36massets/map-pin-BQ5cUnLh.js                     [39m[1m[2m  0.43 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/zap-Bu7RWnvA.js                         [39m[1m[2m  0.44 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/triangle-alert-Bp7GgsPY.js              [39m[1m[2m  0.44 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/award-CFgs6fLh.js                       [39m[1m[2m  0.44 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/lightbulb-B8LHSVzS.js                   [39m[1m[2m  0.45 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/milestone-E7QOuctJ.js                   [39m[1m[2m  0.48 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/users-Dnb_TzhQ.js                       [39m[1m[2m  0.48 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/badge-check-ESHq4qI0.js                 [39m[1m[2m  0.48 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/shield-check-DQySGD1E.js                [39m[1m[2m  0.49 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/gavel-Dd7diBep.js                       [39m[1m[2m  0.49 kB[22m[1m[22m[2m │ gzip:   0.33 kB[22m
+[2mdist/[22m[36massets/languages-DulhDOlW.js                   [39m[1m[2m  0.49 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/graduation-cap-BJ5Zl00V.js              [39m[1m[2m  0.51 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/file-text-BEzOahKQ.js                   [39m[1m[2m  0.51 kB[22m[1m[22m[2m │ gzip:   0.32 kB[22m
+[2mdist/[22m[36massets/share-2-B5MtauaQ.js                     [39m[1m[2m  0.53 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2mdist/[22m[36massets/scale-BthE9ppy.js                       [39m[1m[2m  0.54 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2mdist/[22m[36massets/network-C8VnuAHK.js                     [39m[1m[2m  0.56 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2mdist/[22m[36massets/layers-X1cxp5r6.js                      [39m[1m[2m  0.59 kB[22m[1m[22m[2m │ gzip:   0.34 kB[22m
+[2mdist/[22m[36massets/map-r3-unRg0.js                         [39m[1m[2m  0.60 kB[22m[1m[22m[2m │ gzip:   0.38 kB[22m
+[2mdist/[22m[36massets/user-DFv6FS8A.js                        [39m[1m[2m  0.66 kB[22m[1m[22m[2m │ gzip:   0.35 kB[22m
+[2mdist/[22m[36massets/x-BJK1Txc3.js                           [39m[1m[2m  0.66 kB[22m[1m[22m[2m │ gzip:   0.36 kB[22m
+[2mdist/[22m[36massets/fingerprint-BHOBJrw5.js                 [39m[1m[2m  0.78 kB[22m[1m[22m[2m │ gzip:   0.46 kB[22m
+[2mdist/[22m[36massets/cpu-D8Az25uB.js                         [39m[1m[2m  0.82 kB[22m[1m[22m[2m │ gzip:   0.40 kB[22m
+[2mdist/[22m[36massets/git-branch-hz1nPDDn.js                  [39m[1m[2m  0.87 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+[2mdist/[22m[36massets/layout-dashboard-B1hYFgqK.js            [39m[1m[2m  0.94 kB[22m[1m[22m[2m │ gzip:   0.45 kB[22m
+[2mdist/[22m[36massets/trash-2-BcYQPPeR.js                     [39m[1m[2m  1.08 kB[22m[1m[22m[2m │ gzip:   0.44 kB[22m
+[2mdist/[22m[36massets/workflow-DiJWVt14.js                    [39m[1m[2m  1.38 kB[22m[1m[22m[2m │ gzip:   0.55 kB[22m
+[2mdist/[22m[36massets/user-plus-D82gfX2y.js                   [39m[1m[2m  1.74 kB[22m[1m[22m[2m │ gzip:   0.60 kB[22m
+[2mdist/[22m[36massets/index-DohT61Fz.js                       [39m[1m[2m  4.21 kB[22m[1m[22m[2m │ gzip:   1.98 kB[22m
+[2mdist/[22m[36massets/constants-Cq29-46D.js                   [39m[1m[2m  5.42 kB[22m[1m[22m[2m │ gzip:   2.60 kB[22m
+[2mdist/[22m[36massets/accordion-91Ga1MOQ.js                   [39m[1m[2m  6.93 kB[22m[1m[22m[2m │ gzip:   2.58 kB[22m
+[2mdist/[22m[36massets/ScalabilityStrategy-BMHLCHFr.js         [39m[1m[2m 10.81 kB[22m[1m[22m[2m │ gzip:   3.54 kB[22m
+[2mdist/[22m[36massets/MasterDocumentation-BoJVcF67.js         [39m[1m[2m 11.41 kB[22m[1m[22m[2m │ gzip:   3.27 kB[22m
+[2mdist/[22m[36massets/SecurityArchitecture-Ccibv-ot.js        [39m[1m[2m 12.62 kB[22m[1m[22m[2m │ gzip:   4.09 kB[22m
+[2mdist/[22m[36massets/scroll-area-nZCPZdr3.js                 [39m[1m[2m 13.18 kB[22m[1m[22m[2m │ gzip:   4.27 kB[22m
+[2mdist/[22m[36massets/tabs-BpX5Np6p.js                        [39m[1m[2m 13.91 kB[22m[1m[22m[2m │ gzip:   5.38 kB[22m
+[2mdist/[22m[36massets/RecommendationEngine-o_zAl3vl.js        [39m[1m[2m 15.80 kB[22m[1m[22m[2m │ gzip:   4.77 kB[22m
+[2mdist/[22m[36massets/StrategyDoc-C2dFMjur.js                 [39m[1m[2m 16.37 kB[22m[1m[22m[2m │ gzip:   4.58 kB[22m
+[2mdist/[22m[36massets/EcosystemBlueprint-CJBjXekG.js          [39m[1m[2m 18.28 kB[22m[1m[22m[2m │ gzip:   5.34 kB[22m
+[2mdist/[22m[36massets/InformationArchitecture-C1PzEuvS.js     [39m[1m[2m 20.77 kB[22m[1m[22m[2m │ gzip:   5.83 kB[22m
+[2mdist/[22m[36massets/KnowledgeRelationshipModel-DCTDPP8u.js  [39m[1m[2m 26.21 kB[22m[1m[22m[2m │ gzip:   7.67 kB[22m
+[2mdist/[22m[36massets/KnowledgeModel-BaViZt4R.js              [39m[1m[2m 28.12 kB[22m[1m[22m[2m │ gzip:   7.92 kB[22m
+[2mdist/[22m[36massets/KnowledgeGovernance-DdzBoCvP.js         [39m[1m[2m 28.97 kB[22m[1m[22m[2m │ gzip:   8.25 kB[22m
+[2mdist/[22m[36massets/KnowledgeTypeSystem-BQCTjzfe.js         [39m[1m[2m 31.38 kB[22m[1m[22m[2m │ gzip:   9.33 kB[22m
+[2mdist/[22m[36massets/badge-yNpx-6Db.js                       [39m[1m[2m 32.71 kB[22m[1m[22m[2m │ gzip:  10.65 kB[22m
+[2mdist/[22m[36massets/KnowledgeRepository-Dy4xxINi.js         [39m[1m[2m 40.59 kB[22m[1m[22m[2m │ gzip:   8.32 kB[22m
+[2mdist/[22m[36massets/AdminModule-Bg4qblMN.js                 [39m[1m[2m 60.03 kB[22m[1m[22m[2m │ gzip:  10.86 kB[22m
+[2mdist/[22m[36massets/AuthManagement-DADRJ2ey.js              [39m[1m[2m104.58 kB[22m[1m[22m[2m │ gzip:  32.08 kB[22m
+[2mdist/[22m[36massets/proxy-BpDy0vNO.js                       [39m[1m[2m124.73 kB[22m[1m[22m[2m │ gzip:  40.78 kB[22m
+[2mdist/[22m[36massets/index-BH3AlQNu.js                       [39m[1m[2m550.58 kB[22m[1m[22m[2m │ gzip: 161.22 kB[22m
+[32m✓ built in 11m 28s[39m

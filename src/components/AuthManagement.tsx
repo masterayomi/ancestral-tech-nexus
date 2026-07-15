@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth, type Profile } from '@/contexts/AuthContext'
 import { usePermission } from '@/hooks/usePermission'
@@ -49,16 +50,20 @@ export default function AuthManagement() {
   const { user, profile, loading, signIn, signUp, signOut, resetPassword, updateProfile, logAudit } = useAuth()
   const { can } = usePermission()
   const [view, setView] = useState<AuthView>('signIn')
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (user && profile) {
-      setView('dashboard')
+      // If authenticated and profile exists, navigate to dashboard
+      navigate('/dashboard')
     } else if (user && !profile && !loading) {
-      setView('signIn')
+      // If user exists but no profile, keep them on sign-in/profile flow
+      navigate('/profile')
     } else if (!user && !loading) {
-      setView('signIn')
+      // Ensure unauthenticated users stay on sign-in
+      navigate('/profile')
     }
-  }, [user, profile, loading])
+  }, [user, profile, loading, navigate])
 
   if (loading) {
     return (
