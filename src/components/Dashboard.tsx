@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const { user, profile } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   const isAdmin = profile?.role === 'Administrator' ||
@@ -15,8 +15,12 @@ export default function Dashboard() {
     profile?.role === 'Reviewer'
 
   const navItems = [
-    { id: 'scalability', label: 'Home', to: '/dashboard' },
+    { id: 'scalability', label: 'My Knowledge', to: '/dashboard' },
     { id: 'repository', label: 'Repository', to: '/dashboard/repository' },
+    { id: 'profile', label: 'Profile', to: '/profile' },
+    { id: 'verification', label: 'Verification', to: '/verification' },
+    { id: 'settings', label: 'Settings', to: '/settings' },
+    { id: 'audit', label: 'Audit Log', to: '/audit' },
     { id: 'strategy', label: 'Strategy', to: '/strategy' },
     { id: 'architecture', label: 'Architecture', to: '/architecture' },
     { id: 'security', label: 'Security', to: '/security' },
@@ -56,7 +60,14 @@ export default function Dashboard() {
           </ul>
         </nav>
 
-        <div className="mt-4 text-sm text-stone-400">{user ? user.email : 'Guest'}</div>
+        <div className="mt-4 space-y-2">
+          <div className="text-sm text-stone-400">{user ? user.email : 'Guest'}</div>
+          {user && (
+            <button onClick={async () => { await signOut(); navigate('/'); }} className="w-full text-left px-3 py-2 rounded-md text-sm bg-stone-800 text-stone-200 hover:bg-stone-700 transition-colors">
+              Sign Out
+            </button>
+          )}
+        </div>
       </aside>
 
       {/* Mobile top drawer toggled area (pushes content down, not overlay) */}
@@ -90,6 +101,13 @@ export default function Dashboard() {
                   <li>
                     <button onClick={() => { navigate('/admin'); setMobileNavOpen(false) }} className="w-full text-left px-3 py-2 rounded-md text-sm hover:bg-stone-800 transition-colors">
                       Admin
+                    </button>
+                  </li>
+                )}
+                {user && (
+                  <li>
+                    <button onClick={async () => { await signOut(); setMobileNavOpen(false); navigate('/'); }} className="w-full text-left px-3 py-2 rounded-md text-sm hover:bg-stone-800 transition-colors">
+                      Sign Out
                     </button>
                   </li>
                 )}

@@ -153,14 +153,10 @@ const routes: RouteObject[] = [
         path: 'profile',
         element: <ProfileRoute />,
       },
-      // Keep repository top-level for backward compat, but prefer /dashboard/repository
+      // Redirect legacy /repository to nested dashboard route so Dashboard layout persists
       {
         path: 'repository',
-        element: (
-          <RequireAuth>
-            <RouteWrapper Component={KnowledgeRepository} />
-          </RequireAuth>
-        ),
+        element: <Navigate to="/dashboard/repository" replace />,
       },
     ],
   },
