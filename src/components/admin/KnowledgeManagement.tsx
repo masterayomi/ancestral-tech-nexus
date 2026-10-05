@@ -8,6 +8,7 @@ import {
   RotateCcw, Send, FileText, Filter
 } from 'lucide-react'
 import { KNOWLEDGE_CATEGORIES, VALIDATION_STATUSES, COUNTRIES } from '@/constants'
+import { sanitizeSearchTerm } from '@/lib/search'
 
 interface KnowledgeObject {
   id: string
@@ -75,8 +76,9 @@ export default function KnowledgeManagement() {
       if (statusFilter) query = query.eq('validation_status', statusFilter)
       if (categoryFilter) query = query.eq('indigenous_category', categoryFilter)
       if (countryFilter) query = query.eq('country', countryFilter)
-      if (search) {
-        query = query.or(`title.ilike.%${search}%,summary.ilike.%${search}%`)
+      const searchTerm = sanitizeSearchTerm(search);
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`)
       }
 
       const { data, error, count } = await query

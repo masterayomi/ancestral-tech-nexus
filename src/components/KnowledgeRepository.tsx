@@ -21,6 +21,7 @@ import {
   AFRICAN_REGIONS,
   KNOWLEDGE_REPO_CONSTANTS
 } from '@/constants'
+import { sanitizeSearchTerm } from '@/lib/search'
 
 // Types
 interface KnowledgeObject {
@@ -172,8 +173,9 @@ export default function KnowledgeRepository() {
       if (filters.status) query = query.eq('validation_status', filters.status)
       if (filters.discipline) query = query.eq('scientific_discipline', filters.discipline)
       if (filters.region) query = query.eq('region', filters.region)
-      if (filters.search) {
-        query = query.or(`title.ilike.%${filters.search}%,summary.ilike.%${filters.search}%`)
+      const searchTerm = sanitizeSearchTerm(filters.search);
+      if (searchTerm) {
+        query = query.or(`title.ilike.%${searchTerm}%,summary.ilike.%${searchTerm}%`)
       }
 
       const { data, error: err, count } = await query

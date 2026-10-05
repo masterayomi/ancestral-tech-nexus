@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { ROLES, COUNTRIES } from '@/constants'
 import type { UserRole } from '@/constants'
+import { sanitizeSearchTerm } from '@/lib/search'
 
 interface UserProfile {
   id: string
@@ -61,8 +62,9 @@ export default function UserManagement() {
       if (statusFilter === 'suspended') query = query.eq('is_suspended', true)
       if (statusFilter === 'active') query = query.eq('is_suspended', false)
       if (countryFilter) query = query.eq('country', countryFilter)
-      if (search) {
-        query = query.or(`name.ilike.%${search}%,id.eq.${search}`)
+      const searchTerm = sanitizeSearchTerm(search);
+      if (searchTerm) {
+        query = query.or(`name.ilike.%${searchTerm}%,id.eq.${searchTerm}`)
       }
 
       const { data, error, count } = await query
