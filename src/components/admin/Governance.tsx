@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/integrations/supabase/client'
-import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
 import {
   Shield, Clock, FileText, MessageSquare, Activity, CheckCircle,
@@ -45,7 +44,6 @@ interface VersionEntry {
 }
 
 export default function Governance() {
-  const { user: currentUser } = useAuth()
   const [activeTab, setActiveTab] = useState<GovernanceTab>('review')
   const [reviewQueue, setReviewQueue] = useState<ReviewItem[]>([])
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
@@ -95,17 +93,9 @@ export default function Governance() {
 
   const handleApprove = async (item: ReviewItem) => {
     try {
-      const { error } = await supabase
-        .from('knowledge_objects')
-        .update({ validation_status: 'approved', updated_at: new Date().toISOString() })
-        .eq('id', item.id)
+      // Lifecycle + audit are enforced server-side; the client only requests the move.
+      const { error } = await supabase.rpc('approve_knowledge', { p_object_id: item.id })
       if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_approved',
-        details: { object_id: item.id, title: item.title },
-      })
 
       toast.success('Approved successfully')
       loadTabData()
@@ -116,17 +106,11 @@ export default function Governance() {
 
   const handleReject = async (item: ReviewItem) => {
     try {
-      const { error } = await supabase
-        .from('knowledge_objects')
-        .update({ validation_status: 'revision_requested', updated_at: new Date().toISOString() })
-        .eq('id', item.id)
-      if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_revision_requested',
-        details: { object_id: item.id, title: item.title },
+      const { error } = await supabase.rpc('reject_knowledge', {
+        p_object_id: item.id,
+        p_reason: null,
       })
+      if (error) throw error
 
       toast.success('Revision requested')
       loadTabData()
@@ -137,21 +121,8 @@ export default function Governance() {
 
   const handlePublish = async (item: ReviewItem) => {
     try {
-      const { error } = await supabase
-        .from('knowledge_objects')
-        .update({
-          validation_status: 'published',
-          published_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', item.id)
+      const { error } = await supabase.rpc('publish_knowledge', { p_object_id: item.id })
       if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_published',
-        details: { object_id: item.id, title: item.title },
-      })
 
       toast.success('Published successfully')
       loadTabData()

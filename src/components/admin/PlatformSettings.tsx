@@ -62,12 +62,8 @@ export default function PlatformSettingsPage() {
         if (error) throw error
       }
 
-      await supabase.from('audit_logs').insert({
-        user_id: user?.id,
-        action: 'settings_updated',
-        details: { keys: settings.map(s => s.key) },
-      })
-
+      // Administrative actions are recorded by the database; clients cannot write
+      // their own audit entries.
       toast.success('Settings saved successfully')
     } catch (error: any) {
       toast.error('Failed to save settings: ' + error.message)

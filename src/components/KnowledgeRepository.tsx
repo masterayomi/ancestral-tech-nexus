@@ -226,6 +226,9 @@ export default function KnowledgeRepository() {
     setViewMode('editor')
   }
 
+  // Lifecycle is enforced by the database (trg_enforce_knowledge_lifecycle). The client
+  // always writes a draft and requests the transition separately through the RPC, so a
+  // crafted request cannot put an object straight into 'published'.
   const handleSave = async (status: string = 'draft') => {
     if (!user) {
       toast.error('You must be signed in to contribute.')
@@ -235,7 +238,6 @@ export default function KnowledgeRepository() {
     try {
       const payload = {
         ...editForm,
-        validation_status: status,
         created_by: isEditing ? editForm.created_by : user.id,
         updated_at: new Date().toISOString(),
       }
@@ -247,12 +249,30 @@ export default function KnowledgeRepository() {
           .eq('id', editForm.id)
         if (err) throw err
         toast.success('Knowledge object updated.')
+
+        if (status === 'under_review') {
+          const { error: submitErr } = await supabase.rpc('submit_knowledge_for_review', {
+            p_object_id: editForm.id,
+          })
+          if (submitErr) throw submitErr
+          toast.success('Submitted for review.')
+        }
       } else {
-        const { error: err } = await supabase
+        const { data, error: err } = await supabase
           .from('knowledge_objects')
           .insert({ ...payload, created_by: user.id, created_at: new Date().toISOString() })
+          .select('id')
+          .single()
         if (err) throw err
         toast.success('Knowledge object created.')
+
+        if (status === 'under_review' && data?.id) {
+          const { error: submitErr } = await supabase.rpc('submit_knowledge_for_review', {
+            p_object_id: data.id,
+          })
+          if (submitErr) throw submitErr
+          toast.success('Submitted for review.')
+        }
       }
       setViewMode('hub')
       fetchObjects()
@@ -1132,14 +1152,6 @@ export default function KnowledgeRepository() {
               >
                 <Check className="w-4 h-4" />
                 {KNOWLEDGE_REPO_CONSTANTS.SUBMIT_REVIEW}
-              </button>
-              <button
-                onClick={() => handleSave('published')}
-                disabled={submitting || !editForm.title || !editForm.summary}
-                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-sm font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Globe className="w-4 h-4" />
-                {KNOWLEDGE_REPO_CONSTANTS.PUBLISH}
               </button>
               <button
                 onClick={() => setViewMode('hub')}

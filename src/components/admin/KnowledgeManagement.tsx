@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/integrations/supabase/client'
-import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
 import {
   Search, BookOpen, Edit, Trash2, Archive, CheckCircle, XCircle,
@@ -38,7 +37,6 @@ interface KnowledgeVersion {
 }
 
 export default function KnowledgeManagement() {
-  const { user: currentUser } = useAuth()
   const [objects, setObjects] = useState<KnowledgeObject[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
@@ -98,23 +96,26 @@ export default function KnowledgeManagement() {
 
   const handleStatusChange = async (obj: KnowledgeObject, newStatus: string) => {
     try {
-      const updates: any = {
-        validation_status: newStatus,
-        updated_at: new Date().toISOString(),
+      // Transitions go through the lifecycle RPCs so the database validates them and
+      // records the audit entry with a server-derived actor.
+      const rpcs: Record<string, string> = {
+        under_review: 'submit_knowledge_for_review',
+        approved: 'approve_knowledge',
+        revision_requested: 'reject_knowledge',
+        published: 'publish_knowledge',
       }
-      if (newStatus === 'published') updates.published_at = new Date().toISOString()
+      const rpcName = rpcs[newStatus]
 
-      const { error } = await supabase
-        .from('knowledge_objects')
-        .update(updates)
-        .eq('id', obj.id)
-      if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: `knowledge_${newStatus}`,
-        details: { object_id: obj.id, title: obj.title, old_status: obj.validation_status },
-      })
+      if (rpcName) {
+        const { error } = await supabase.rpc(rpcName, { p_object_id: obj.id })
+        if (error) throw error
+      } else {
+        const { error } = await supabase
+          .from('knowledge_objects')
+          .update({ validation_status: newStatus, updated_at: new Date().toISOString() })
+          .eq('id', obj.id)
+        if (error) throw error
+      }
 
       toast.success(`Knowledge object ${newStatus}`)
       fetchObjects()
@@ -132,12 +133,6 @@ export default function KnowledgeManagement() {
         .update({ is_deleted: true, updated_at: new Date().toISOString() })
         .eq('id', selectedObject.id)
       if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_archived',
-        details: { object_id: selectedObject.id, title: selectedObject.title },
-      })
 
       toast.success('Knowledge object archived')
       setShowDeleteModal(false)
@@ -157,12 +152,6 @@ export default function KnowledgeManagement() {
         .eq('id', obj.id)
       if (error) throw error
 
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_restored',
-        details: { object_id: obj.id, title: obj.title },
-      })
-
       toast.success('Knowledge object restored')
       fetchObjects()
     } catch (error: any) {
@@ -179,12 +168,6 @@ export default function KnowledgeManagement() {
         .delete()
         .eq('id', selectedObject.id)
       if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_permanently_deleted',
-        details: { object_id: selectedObject.id, title: selectedObject.title },
-      })
 
       toast.success('Knowledge object permanently deleted')
       setShowDeleteModal(false)
@@ -205,12 +188,6 @@ export default function KnowledgeManagement() {
         .update({ ...editForm, updated_at: new Date().toISOString() })
         .eq('id', selectedObject.id)
       if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'knowledge_edited',
-        details: { object_id: selectedObject.id, fields: Object.keys(editForm) },
-      })
 
       toast.success('Knowledge object updated')
       setShowEditModal(false)

@@ -84,21 +84,13 @@ export default function UserManagement() {
     if (!selectedUser) return
     setSubmitting(true)
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole, updated_at: new Date().toISOString() })
-        .eq('id', selectedUser.id)
-      if (error) throw error
-
-      // Also update user_roles
-      await supabase.from('user_roles').update({ role: newRole }).eq('user_id', selectedUser.id)
-
-      // Log audit
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'role_change',
-        details: { target_user: selectedUser.id, old_role: selectedUser.role, new_role: newRole },
+      // Role changes are applied and audited server-side. Clients cannot write
+      // user_roles directly, and cannot record their own role_change audit rows.
+      const { error } = await supabase.rpc('admin_set_user_role', {
+        p_user_id: selectedUser.id,
+        p_role: newRole,
       })
+      if (error) throw error
 
       toast.success(`Role updated to ${newRole}`)
       setShowRoleModal(false)
@@ -126,12 +118,6 @@ export default function UserManagement() {
         .eq('id', selectedUser.id)
       if (error) throw error
 
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'user_suspended',
-        details: { target_user: selectedUser.id, reason: suspensionReason },
-      })
-
       toast.success('User suspended')
       setShowSuspendModal(false)
       setSuspensionReason('')
@@ -157,12 +143,6 @@ export default function UserManagement() {
         .eq('id', user.id)
       if (error) throw error
 
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'user_reactivated',
-        details: { target_user: user.id },
-      })
-
       toast.success('User reactivated')
       fetchUsers()
     } catch (error: any) {
@@ -186,12 +166,6 @@ export default function UserManagement() {
         })
         .eq('id', selectedUser.id)
       if (error) throw error
-
-      await supabase.from('audit_logs').insert({
-        user_id: currentUser?.id,
-        action: 'user_deleted',
-        details: { target_user: selectedUser.id },
-      })
 
       toast.success('User account deleted')
       setShowDeleteModal(false)
@@ -323,7 +297,7 @@ export default function UserManagement() {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-stone-400">{u.country || '—'}</td>
+                    <td className="px-6 py-4 text-sm text-stone-400">{u.country || '�'}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
                         <button
@@ -435,19 +409,19 @@ export default function UserManagement() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Country</p>
-                    <p className="text-sm text-white">{selectedUser.country || '—'}</p>
+                    <p className="text-sm text-white">{selectedUser.country || '�'}</p>
                   </div>
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Community</p>
-                    <p className="text-sm text-white">{selectedUser.community || '—'}</p>
+                    <p className="text-sm text-white">{selectedUser.community || '�'}</p>
                   </div>
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Institution</p>
-                    <p className="text-sm text-white">{selectedUser.institution || '—'}</p>
+                    <p className="text-sm text-white">{selectedUser.institution || '�'}</p>
                   </div>
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Language</p>
-                    <p className="text-sm text-white">{selectedUser.indigenous_language || '—'}</p>
+                    <p className="text-sm text-white">{selectedUser.indigenous_language || '�'}</p>
                   </div>
                 </div>
                 <div className="bg-stone-800/50 rounded-xl p-3">
