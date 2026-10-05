@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+﻿import React, { useEffect, useState } from 'react'
 import { useAuth, type Profile } from '@/contexts/AuthContext'
 import { usePermission } from '@/hooks/usePermission'
 import { Button } from './ui/button'
@@ -44,7 +44,6 @@ export default function ProfileEditorPage() {
       name, biography, institution, country, community,
       indigenous_language: indigenousLanguage,
     }
-    if (canManageRoles) (updates as Record<string, unknown>).role = role
     const { error } = await updateProfile(updates)
     setSaving(false)
     if (error) toast.error(error.message)
