@@ -11,6 +11,7 @@ import {
 import { ROLES, COUNTRIES } from '@/constants'
 import type { UserRole } from '@/constants'
 import { sanitizeSearchTerm } from '@/lib/search'
+import { useCapabilities } from '@/lib/capabilities'
 
 interface UserProfile {
   id: string
@@ -46,6 +47,8 @@ export default function UserManagement() {
   const [newRole, setNewRole] = useState<UserRole>('Student')
   const [suspensionReason, setSuspensionReason] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const capabilities = useCapabilities()
+  const roleChangeUnavailable = capabilities?.roleChangeRpc === 'missing'
 
   const PAGE_SIZE = 20
 
@@ -299,7 +302,7 @@ export default function UserManagement() {
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-stone-400">{u.country || '�'}</td>
+                    <td className="px-6 py-4 text-sm text-stone-400">{u.country || '—'}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
                         <button
@@ -411,19 +414,19 @@ export default function UserManagement() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Country</p>
-                    <p className="text-sm text-white">{selectedUser.country || '�'}</p>
+                    <p className="text-sm text-white">{selectedUser.country || '—'}</p>
                   </div>
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Community</p>
-                    <p className="text-sm text-white">{selectedUser.community || '�'}</p>
+                    <p className="text-sm text-white">{selectedUser.community || '—'}</p>
                   </div>
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Institution</p>
-                    <p className="text-sm text-white">{selectedUser.institution || '�'}</p>
+                    <p className="text-sm text-white">{selectedUser.institution || '—'}</p>
                   </div>
                   <div className="bg-stone-800/50 rounded-xl p-3">
                     <p className="text-xs text-stone-500 mb-1">Language</p>
-                    <p className="text-sm text-white">{selectedUser.indigenous_language || '�'}</p>
+                    <p className="text-sm text-white">{selectedUser.indigenous_language || '—'}</p>
                   </div>
                 </div>
                 <div className="bg-stone-800/50 rounded-xl p-3">
@@ -466,10 +469,20 @@ export default function UserManagement() {
               <p className="text-sm text-stone-400 mb-4">
                 Change role for <span className="text-white font-medium">{selectedUser.name}</span>
               </p>
+              {roleChangeUnavailable && (
+                <div className="flex items-start gap-2 bg-amber-900/20 border border-amber-800/50 rounded-xl p-3 mb-4">
+                  <Shield className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-stone-400">
+                    Role changes are unavailable — the <span className="font-mono text-stone-300">admin_set_user_role</span>
+                    {' '}service is not deployed on this database.
+                  </p>
+                </div>
+              )}
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value as UserRole)}
-                className="w-full px-4 py-2.5 bg-stone-800 border border-stone-700 rounded-xl text-sm text-white mb-4 focus:outline-none focus:border-emerald-600"
+                disabled={roleChangeUnavailable}
+                className="w-full px-4 py-2.5 bg-stone-800 border border-stone-700 rounded-xl text-sm text-white mb-4 focus:outline-none focus:border-emerald-600 disabled:opacity-50"
               >
                 {ROLES.map((role) => (
                   <option key={role} value={role}>{role}</option>
@@ -484,7 +497,7 @@ export default function UserManagement() {
                 </button>
                 <button
                   onClick={handleChangeRole}
-                  disabled={submitting || newRole === selectedUser.role}
+                  disabled={submitting || newRole === selectedUser.role || roleChangeUnavailable}
                   className="flex-1 px-4 py-2.5 rounded-xl text-sm bg-emerald-600 hover:bg-emerald-500 text-white font-medium disabled:opacity-50 transition-all"
                 >
                   {submitting ? 'Saving...' : 'Update Role'}

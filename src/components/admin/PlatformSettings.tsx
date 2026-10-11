@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
+import { useCapabilities } from '@/lib/capabilities'
 import { Settings, Save, Loader2, Shield, Globe, Upload, Mail, UserPlus } from 'lucide-react'
 
 interface PlatformSetting {
@@ -18,10 +19,12 @@ export default function PlatformSettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editValues, setEditValues] = useState<Record<string, string>>({})
+  const [tableMissing, setTableMissing] = useState(false)
+  const capabilities = useCapabilities()
 
   useEffect(() => {
-    fetchSettings()
-  }, [])
+    if (capabilities) fetchSettings()
+  }, [capabilities])
 
   const fetchSettings = async () => {
     try {
@@ -29,7 +32,13 @@ export default function PlatformSettingsPage() {
         .from('platform_settings')
         .select('*')
         .order('key')
-      if (error) throw error
+      if (error) {
+        if (error.code === 'PGRST205' || error.code === '42P01') {
+          setTableMissing(true)
+          return
+        }
+        throw error
+      }
       setSettings(data || [])
       const values: Record<string, string> = {}
       ;(data || []).forEach((s: PlatformSetting) => {
@@ -84,10 +93,31 @@ export default function PlatformSettingsPage() {
     }
   }
 
-  if (loading) {
+  const notConfigured = tableMissing || capabilities?.platformSettings === 'missing'
+
+  if (loading && !notConfigured) {
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-6 h-6 animate-spin text-emerald-400" />
+      </div>
+    )
+  }
+
+  if (notConfigured) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-white">Platform Settings</h2>
+          <p className="text-stone-400 text-sm mt-1">Configure platform-wide settings</p>
+        </div>
+        <div className="bg-amber-900/20 border border-amber-800/50 rounded-2xl p-8 text-center">
+          <Shield className="w-12 h-12 text-amber-400 mx-auto mb-3" />
+          <p className="text-stone-300 font-medium">Platform settings are not configured</p>
+          <p className="text-stone-500 text-sm mt-2 max-w-md mx-auto">
+            The <span className="font-mono text-stone-400">platform_settings</span> table has not been deployed to this
+            database. Once the database schema is updated, settings will appear here and become editable.
+          </p>
+        </div>
       </div>
     )
   }

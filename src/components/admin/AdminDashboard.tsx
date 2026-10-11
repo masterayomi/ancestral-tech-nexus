@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
+import { useCapabilities } from '@/lib/capabilities'
 import {
   Users, BookOpen, Clock, CheckCircle, Building2, Globe,
   Languages, Activity, Bell, TrendingUp, AlertCircle, Loader2
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+  const capabilities = useCapabilities()
 
   useEffect(() => {
     fetchDashboardData()
@@ -119,6 +121,19 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
+      {capabilities?.notifications === 'missing' && (
+        <div className="flex items-start gap-3 bg-amber-900/20 border border-amber-800/50 rounded-2xl p-4">
+          <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-amber-300">In-app notifications are not available</p>
+            <p className="text-xs text-stone-400 mt-1">
+              The <span className="font-mono text-stone-300">notifications</span> table has not been deployed to this
+              database. Other dashboard data still loads normally.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat, i) => {

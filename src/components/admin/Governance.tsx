@@ -7,6 +7,7 @@ import {
   XCircle, Eye, Loader2, ChevronDown, ChevronUp, AlertCircle
 } from 'lucide-react'
 import { VALIDATION_STATUSES } from '@/constants'
+import { useCapabilities } from '@/lib/capabilities'
 
 type GovernanceTab = 'review' | 'audit' | 'versions' | 'comments' | 'timeline'
 
@@ -49,6 +50,7 @@ export default function Governance() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [recentVersions, setRecentVersions] = useState<VersionEntry[]>([])
   const [loading, setLoading] = useState(false)
+  const capabilities = useCapabilities()
 
   useEffect(() => {
     loadTabData()
@@ -204,26 +206,34 @@ export default function Governance() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => handleApprove(item)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-900/50 text-green-400 hover:bg-green-900 border border-green-800/50 transition-all"
-                        >
-                          <CheckCircle className="w-3.5 h-3.5 inline mr-1" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handlePublish(item)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-900/50 text-emerald-400 hover:bg-emerald-900 border border-emerald-800/50 transition-all"
-                        >
-                          Publish
-                        </button>
-                        <button
-                          onClick={() => handleReject(item)}
-                          className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-900/50 text-red-400 hover:bg-red-900 border border-red-800/50 transition-all"
-                        >
-                          <XCircle className="w-3.5 h-3.5 inline mr-1" />
-                          Reject
-                        </button>
+                        {capabilities?.lifecycleRpc === 'missing' ? (
+                          <span className="text-xs text-stone-500 text-right max-w-[180px]">
+                            Lifecycle service not deployed — transitions unavailable
+                          </span>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleApprove(item)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-green-900/50 text-green-400 hover:bg-green-900 border border-green-800/50 transition-all"
+                            >
+                              <CheckCircle className="w-3.5 h-3.5 inline mr-1" />
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handlePublish(item)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-900/50 text-emerald-400 hover:bg-emerald-900 border border-emerald-800/50 transition-all"
+                            >
+                              Publish
+                            </button>
+                            <button
+                              onClick={() => handleReject(item)}
+                              className="px-3 py-1.5 rounded-lg text-xs font-medium bg-red-900/50 text-red-400 hover:bg-red-900 border border-red-800/50 transition-all"
+                            >
+                              <XCircle className="w-3.5 h-3.5 inline mr-1" />
+                              Reject
+                            </button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </motion.div>

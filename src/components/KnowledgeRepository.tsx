@@ -22,6 +22,7 @@ import {
   KNOWLEDGE_REPO_CONSTANTS
 } from '@/constants'
 import { sanitizeSearchTerm } from '@/lib/search'
+import { useCapabilities } from '@/lib/capabilities'
 
 // Types
 interface KnowledgeObject {
@@ -144,6 +145,7 @@ export default function KnowledgeRepository() {
   const [totalCount, setTotalCount] = useState(0)
   const [detailTab, setDetailTab] = useState<'details' | 'versions' | 'relationships'>('details')
   const [submitting, setSubmitting] = useState(false)
+  const capabilities = useCapabilities()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showHardDeleteConfirm, setShowHardDeleteConfirm] = useState(false)
 
@@ -231,6 +233,25 @@ export default function KnowledgeRepository() {
   // Lifecycle is enforced by the database (trg_enforce_knowledge_lifecycle). The client
   // always writes a draft and requests the transition separately through the RPC, so a
   // crafted request cannot put an object straight into 'published'.
+  const submitForReview = async (objectId: string) => {
+    if (capabilities?.lifecycleRpc === 'missing') {
+      toast.info('Object saved. Submitting for review is unavailable — the lifecycle service is not deployed on this database.')
+      return
+    }
+    const { error: submitErr } = await supabase.rpc('submit_knowledge_for_review', {
+      p_object_id: objectId,
+    })
+    if (submitErr) {
+      if (submitErr.code === 'PGRST202') {
+        toast.info('Object saved. Submitting for review is unavailable on this database.')
+      } else {
+        throw submitErr
+      }
+    } else {
+      toast.success('Submitted for review.')
+    }
+  }
+
   const handleSave = async (status: string = 'draft') => {
     if (!user) {
       toast.error('You must be signed in to contribute.')
@@ -253,11 +274,7 @@ export default function KnowledgeRepository() {
         toast.success('Knowledge object updated.')
 
         if (status === 'under_review') {
-          const { error: submitErr } = await supabase.rpc('submit_knowledge_for_review', {
-            p_object_id: editForm.id,
-          })
-          if (submitErr) throw submitErr
-          toast.success('Submitted for review.')
+          await submitForReview(editForm.id)
         }
       } else {
         const { data, error: err } = await supabase
@@ -269,11 +286,7 @@ export default function KnowledgeRepository() {
         toast.success('Knowledge object created.')
 
         if (status === 'under_review' && data?.id) {
-          const { error: submitErr } = await supabase.rpc('submit_knowledge_for_review', {
-            p_object_id: data.id,
-          })
-          if (submitErr) throw submitErr
-          toast.success('Submitted for review.')
+          await submitForReview(data.id)
         }
       }
       setViewMode('hub')

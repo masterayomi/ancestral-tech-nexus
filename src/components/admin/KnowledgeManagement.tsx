@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { KNOWLEDGE_CATEGORIES, VALIDATION_STATUSES, COUNTRIES } from '@/constants'
 import { sanitizeSearchTerm } from '@/lib/search'
+import { useCapabilities } from '@/lib/capabilities'
 
 interface KnowledgeObject {
   id: string
@@ -55,6 +56,8 @@ export default function KnowledgeManagement() {
   const [versions, setVersions] = useState<KnowledgeVersion[]>([])
   const [editForm, setEditForm] = useState<Partial<KnowledgeObject>>({})
   const [submitting, setSubmitting] = useState(false)
+  const capabilities = useCapabilities()
+  const lifecycleUnavailable = capabilities?.lifecycleRpc === 'missing'
 
   const PAGE_SIZE = 20
 
@@ -348,7 +351,7 @@ export default function KnowledgeManagement() {
                     >
                       <FileText className="w-4 h-4" />
                     </button>
-                    {obj.validation_status === 'under_review' && (
+                    {!lifecycleUnavailable && obj.validation_status === 'under_review' && (
                       <>
                         <button
                           onClick={() => handleStatusChange(obj, 'approved')}
@@ -366,7 +369,7 @@ export default function KnowledgeManagement() {
                         </button>
                       </>
                     )}
-                    {obj.validation_status === 'approved' && (
+                    {!lifecycleUnavailable && obj.validation_status === 'approved' && (
                       <button
                         onClick={() => handleStatusChange(obj, 'published')}
                         className="p-2 rounded-lg hover:bg-stone-700 text-stone-400 hover:text-emerald-400 transition-colors"
