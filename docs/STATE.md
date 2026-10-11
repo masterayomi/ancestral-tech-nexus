@@ -161,8 +161,49 @@ even though they sit in `supabase/migrations/` (added in commit `b1b23fd`).
 
 ## 7. Remaining plan
 
-- [ ] Step 2 — `npm install`, `npm run build`, `npm run dev`; fix errors; one commit
+- [x] Step 2 — `npm install`, `npm run build`, `npm run dev`; fix errors; one commit
       per fix. Verify home page + repository load with no console errors.
-- [ ] Step 3 — resolve the open decisions above; then finish documented features
+- [x] Step 3 — resolve the open decisions above; then finish documented features
       (audit-write cleanup, nav/dead-links, 404 page, branding, encoding fix).
 - [ ] Step 4 — user-flow smoke test, seed data, `TESTING.md`, final commit + report.
+
+## 8. Step 3 decisions and completed fixes (2026-10-11)
+
+User decided: **do NOT touch the live database**; remove tracked junk files;
+install Playwright CLI for user-flow testing.
+
+- **DB unchanged.** The app now degrades gracefully wherever server objects are
+  missing instead of failing hard:
+  - New `src/lib/capabilities.ts` probes (cached, one-time) whether the lifecycle
+    RPCs, `admin_set_user_role`, `platform_settings`, and `notifications` exist,
+    and exposes `useCapabilities()`.
+  - `AdminDashboard` — banner explaining the `notifications` table isn't deployed;
+    stats still load (counts/activity/recent rows come back as empty, not errors).
+  - `PlatformSettings` — shows a "not configured" state instead of a broken form.
+  - `Governance` + `KnowledgeManagement` — Approve/Publish/Reject/Revision buttons
+    are hidden with an explanatory note when the lifecycle RPCs are missing;
+    archive/restore/edit (direct row updates) still work.
+  - `UserManagement` — role-change modal disables with a note when
+    `admin_set_user_role` is missing; suspend/reactivate/delete keep working.
+  - `KnowledgeRepository` — submitting for review reports "lifecycle service not
+    deployed" (object is still saved as a draft); `PGRST202` handled specifically.
+- **AuthContext** no longer writes to `audit_logs` from the client (no INSERT
+  policy exists; audit is trigger-generated server-side). `logAudit` removed.
+- **Dashboard** — dead nav links removed (`/verification`, `/settings`, `/audit`);
+  product name corrected to `APP_NAME`; added reachable doc links (Model, Types,
+  Graph, Recommendations, Governance Guide, Multilingual, Reference).
+- **Routing** — new 404 page + catch-all `*` route; root `errorElement` error
+  boundary via `useRouteError()`; the orphaned `MultilingualArchitecture` page is
+  now routed at `/multilingual`.
+- **Branding** — `index.html` meta + title and `README.md` rewritten for
+  Knowledge Bridge Africa (no more Gebeya Dala / starter-template).
+- **Fixed encoding** — replaced U+FFFD replacement glyphs in `UserManagement.tsx`.
+- **Repo hygiene** — `git rm` of tracked junk (`react-starter-template@0.0.0`,
+  `vite`, `build-output.txt`, `bun.lock`); `bun.lock` added to `.gitignore`.
+- **Known backlog (untouched):** ~140 pre-existing ESLint errors
+  (`no-explicit-any`, `no-unused-vars`, `react-refresh`) across the codebase —
+  prior changelogs claimed lint-clean, which is inaccurate. Type errors: 0;
+  production build passes. Not fixed to avoid a large, low-value diff; consider as
+  follow-up.
+
+Commits: `b054b15`, `633453d`, `3f5a3f3`, `4f7fa55`, `ba5937e`, `e0dd1f3`.
