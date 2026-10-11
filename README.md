@@ -1,120 +1,103 @@
-# React + Vite + shadcn/ui Starter Template
+# Knowledge Bridge Africa
 
-A modern React starter template built with Vite, TypeScript, Tailwind CSS, and shadcn/ui components.
+Bridging indigenous wisdom and modern research across the continent.
 
-## 🚀 Features
+Knowledge Bridge Africa is a web platform where students, researchers, community elders, and institutions can collect, contribute, review, and share indigenous African knowledge — paired with modern scientific context.
 
-- ⚡️ **Vite** - Fast build tool and development server
-- ⚛️ **React 18** - Latest React with hooks support
-- 🎯 **TypeScript** - Type safety and better developer experience
-- 🎨 **Tailwind CSS** - Utility-first CSS framework
-- 🧩 **shadcn/ui** - Beautifully designed components built with Radix UI
-- 📦 **Path Mapping** - Clean imports with `@/` prefix
+## Tech Stack
 
-## 📦 Included shadcn/ui Components
+- **React 18** + **TypeScript** + **Vite**
+- **React Router** (lazy-loaded routes)
+- **Tailwind CSS** + **shadcn/ui** components
+- **Framer Motion** animations
+- **Supabase** (Auth, Postgres, RLS, RPCs) via `@supabase/supabase-js`
+- **Sonner** toasts
 
-- Button
-- Card
-- Input
-- Label
-- Badge
-- Dialog
-- And more...
+## Getting Started
 
-## 🛠️ Getting Started
-
-1. **Install dependencies**
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. **Start development server**
+2. Configure Supabase by creating a `.env.local` file:
+
+   ```env
+   VITE_SUPABASE_URL=https://<your-project>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<your-anon-key>
+   ```
+
+3. Start the development server:
 
    ```bash
    npm run dev
    ```
 
-3. **Build for production**
+4. Build for production:
 
    ```bash
    npm run build
    ```
 
-4. **Preview production build**
+5. Preview a production build:
+
    ```bash
    npm run preview
    ```
 
-## 📁 Project Structure
+## Scripts
+
+| Command                 | Description                            |
+| ----------------------- | -------------------------------------- |
+| `npm run dev`           | Start the Vite dev server              |
+| `npm run build`         | Type-check + production build           |
+| `npm run typecheck`     | Run `tsc --noEmit`                      |
+| `npm run lint`          | Run ESLint                              |
+| `npm run preview`       | Serve the production build locally      |
+
+## Project Structure
 
 ```
 src/
-├── components/
-│   └── ui/              # shadcn/ui components
-├── lib/
-│   └── utils.ts         # Utility functions
-├── App.tsx              # Main application component
-├── index.css            # Global styles with Tailwind
-└── main.tsx             # Application entry point
+├── components/            # Pages and feature components
+│   ├── admin/             # Admin dashboard module
+│   └── ui/                # shadcn/ui components
+├── contexts/
+│   └── AuthContext.tsx    # Session + profile state
+├── hooks/
+│   └── usePermission.ts   # Role-based access helpers
+├── integrations/
+│   └── supabase/
+│       └── client.ts      # Supabase client
+├── lib/                   # Utilities (search, capabilities, cn)
+├── router.tsx             # Route definitions + auth guards
+├── App.tsx                # Root layout
+└── main.tsx               # Application entry point
 ```
 
-## 🎨 Customization
+## Key Routes
 
-### Adding New shadcn/ui Components
+| Route                      | Purpose                              |
+| -------------------------- | ------------------------------------ |
+| `/dashboard`               | Dashboard (Overview doc)             |
+| `/dashboard/repository`    | Knowledge repository (CRUD)          |
+| `/profile`                 | Sign in / sign up / profile editor   |
+| `/admin`                   | Admin module (dashboard, users, ...) |
+| `/strategy` … `/reference` | Product documentation pages          |
 
-This template is pre-configured with shadcn/ui. You can add more components by creating them in the `src/components/ui/` directory.
+## Database
 
-### Tailwind Configuration
+The platform expects a Supabase schema built from `supabase/migrations/`. A few things to note:
 
-The Tailwind configuration is set up with shadcn/ui color variables. You can customize colors and other design tokens in:
+- Knowledge lifecycle transitions (`submit_knowledge_for_review`, `approve_knowledge`, `reject_knowledge`, `publish_knowledge`) are enforced **server-side** by RPCs and triggers.
+- Audit entries are written by **database triggers**, not by the client. Components never write to `audit_logs` directly.
+- If the schema is missing these objects, admin surfaces degrade gracefully with an explanatory notice instead of failing hard.
 
-- `tailwind.config.js` - Tailwind configuration
-- `src/index.css` - CSS custom properties for themes
+## Testing
 
-### TypeScript Configuration
+See `TESTING.md` for the user-flow smoke test checklist.
 
-Path mapping is configured for clean imports:
+## License
 
-```typescript
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-```
-
-## 🌗 Dark Mode
-
-The template includes dark mode support through Tailwind's `dark:` classes and CSS custom properties.
-
-## 📚 Learn More
-
-- [Vite Documentation](https://vitejs.dev/)
-- [React Documentation](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Radix UI](https://www.radix-ui.com/)
-
-## 🤝 Contributing
-
-Feel free to submit issues and enhancement requests!
-
-**⚡ Powered by [Dala](https://dala.gebeya.com)** - The AI-powered web development platform that helps you build full-stack applications faster.
-
----
-
-## 🤖 What is Dala?
-
-**[Gebeya Dala](https://dala.gebeya.com)** is an intelligent web development platform that accelerates your React development workflow. Build, preview, and deploy web applications, and instant development environments.
-
-🔗 **Try Dala:** [dala.gebeya.com](https://dala.gebeya.com)
-
-### Why Use Dala?
-
-- **AI-Powered Development** - Get intelligent code suggestions and automated component generation
-- **Instant Preview** - See your changes live in real-time sandbox environments
-- **Zero Setup** - No local environment configuration needed
-- **Collaborative** - Build and share projects with your team
-- **Deployment Ready** - One-click deployment to production
-
----
-
-Built with ❤️ by the Dala team to help developers build faster and smarter.
+N/A — internal project.
