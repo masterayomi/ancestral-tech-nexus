@@ -35,7 +35,6 @@ interface AuthContextValue {
   resetPassword: (email: string) => Promise<{ error: Error | null }>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: Error | null }>
   refreshProfile: () => Promise<void>
-  logAudit: (action: string, details?: Record<string, unknown>) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -82,23 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [fetchProfile])
 
-  const logAudit = useCallback(async (action: string, details: Record<string, unknown> = {}) => {
-    if (!user) return
-    await supabase.from('audit_logs').insert({
-      user_id: user.id,
-      action,
-      details,
-    })
-  }, [user])
-
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error) {
-      const { data: { user: u } } = await supabase.auth.getUser()
-      if (u) {
-        await supabase.from('audit_logs').insert({ user_id: u.id, action: 'login', details: {} })
-      }
-    }
     return { error }
   }, [])
 
@@ -112,11 +96,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    if (user) {
-      await supabase.from('audit_logs').insert({ user_id: user.id, action: 'logout', details: {} })
-    }
+    // Audit entries (login/logout/profile changes) are recorded server-side by
+    // triggers; clients cannot write to audit_logs (no INSERT policy).
     await supabase.auth.signOut()
-  }, [user])
+  }, [])
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email)
@@ -131,10 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .eq('id', user.id)
     if (!error) {
       await fetchProfile(user.id)
-      await logAudit('profile_edit', { fields: Object.keys(updates) })
     }
     return { error }
-  }, [user, fetchProfile, logAudit])
+  }, [user, fetchProfile])
 
   const refreshProfile = useCallback(async () => {
     if (user) await fetchProfile(user.id)
@@ -143,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     session, user, profile, loading,
     signIn, signUp, signOut, resetPassword,
-    updateProfile, refreshProfile, logAudit,
+    updateProfile, refreshProfile,
   }
 
   return (
