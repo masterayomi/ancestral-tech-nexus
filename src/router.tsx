@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { createBrowserRouter, Navigate, RouteObject } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouteObject, Link, useRouteError } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
@@ -22,6 +22,8 @@ const AdminModule = lazy(() => import('./components/admin/AdminModule'))
 const AuthManagement = lazy(() => import('./components/AuthManagement'))
 const KnowledgeRepository = lazy(() => import('./components/KnowledgeRepository'))
 const ProfileEditor = lazy(() => import('./components/ProfileEditor'))
+const NotFound = lazy(() => import('./components/NotFound'))
+const MultilingualArchitecture = lazy(() => import('./components/MultilingualArchitecture'))
 
 // Loading fallback component
 function LoadingFallback() {
@@ -67,10 +69,27 @@ function ProfileRoute() {
   return user ? <RouteWrapper Component={ProfileEditor} /> : <RouteWrapper Component={AuthManagement} />
 }
 
+function RouteErrorBoundary() {
+  const error = useRouteError()
+  const message = error instanceof Error ? error.message : 'An unexpected error occurred.'
+  return (
+    <div className="min-h-screen bg-background text-foreground font-sans flex items-center justify-center p-6">
+      <div className="text-center max-w-md">
+        <h1 className="text-2xl font-bold text-white mb-2">Something went wrong</h1>
+        <p className="text-stone-500 text-sm mb-6">{message}</p>
+        <Link to="/" className="inline-block px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors">
+          Back to home
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 // Route definitions
 const routes: RouteObject[] = [ 
   {
     path: '/',
+    errorElement: <RouteErrorBoundary />,
     element: <RootLayout />,
     children: [
       {
@@ -142,6 +161,10 @@ const routes: RouteObject[] = [
         element: <RouteWrapper Component={MasterDocumentation} />,
       },
       {
+        path: 'multilingual',
+        element: <RouteWrapper Component={MultilingualArchitecture} />,
+      },
+      {
         path: 'admin',
         element: (
           <RequireAuth>
@@ -157,6 +180,10 @@ const routes: RouteObject[] = [
       {
         path: 'repository',
         element: <Navigate to="/dashboard/repository" replace />,
+      },
+      {
+        path: '*',
+        element: <RouteWrapper Component={NotFound} />,
       },
     ],
   },
