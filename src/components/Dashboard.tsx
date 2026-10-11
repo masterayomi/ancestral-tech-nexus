@@ -1,7 +1,8 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import { Shield, BookOpen } from 'lucide-react'
+import { Shield } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { APP_NAME } from '@/constants'
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -15,16 +16,20 @@ export default function Dashboard() {
     profile?.role === 'Reviewer'
 
   const navItems = [
-    { id: 'scalability', label: 'My Knowledge', to: '/dashboard' },
+    { id: 'overview', label: 'Overview', to: '/dashboard' },
     { id: 'repository', label: 'Repository', to: '/dashboard/repository' },
     { id: 'profile', label: 'Profile', to: '/profile' },
-    { id: 'verification', label: 'Verification', to: '/verification' },
-    { id: 'settings', label: 'Settings', to: '/settings' },
-    { id: 'audit', label: 'Audit Log', to: '/audit' },
     { id: 'strategy', label: 'Strategy', to: '/strategy' },
     { id: 'architecture', label: 'Architecture', to: '/architecture' },
+    { id: 'model', label: 'Model', to: '/model' },
+    { id: 'types', label: 'Types', to: '/types' },
+    { id: 'graph', label: 'Graph', to: '/graph' },
+    { id: 'recommendations', label: 'Recommendations', to: '/recommendations' },
+    { id: 'governance', label: 'Governance Guide', to: '/governance' },
+    { id: 'multilingual', label: 'Multilingual', to: '/multilingual' },
     { id: 'security', label: 'Security', to: '/security' },
     { id: 'ecosystem', label: 'Ecosystem', to: '/ecosystem' },
+    { id: 'reference', label: 'Reference', to: '/reference' },
   ]
 
   return (
@@ -37,7 +42,7 @@ export default function Dashboard() {
           </div>
           <div>
             <div className="text-xs text-stone-400 font-semibold">Dashboard</div>
-            <div className="text-sm font-bold">Knowledge Nexus</div>
+            <div className="text-sm font-bold">{APP_NAME}</div>
           </div>
         </div>
 
@@ -77,7 +82,7 @@ export default function Dashboard() {
             <div className="w-8 h-8 bg-amber-500/20 rounded flex items-center justify-center">
               <Shield className="w-4 h-4 text-amber-400" />
             </div>
-            <div className="text-sm font-bold">Knowledge Nexus</div>
+            <div className="text-sm font-bold">{APP_NAME}</div>
           </div>
           <div>
             <button onClick={() => setMobileNavOpen(v => !v)} className="px-3 py-2 rounded-md bg-stone-800 text-stone-300">
