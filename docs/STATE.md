@@ -207,3 +207,28 @@ install Playwright CLI for user-flow testing.
   follow-up.
 
 Commits: `b054b15`, `633453d`, `3f5a3f3`, `4f7fa55`, `ba5937e`, `e0dd1f3`.
+
+## 9. Step 4 — testing attempts and security policy (2026-10-11)
+
+- **Signed-out smoke tests passed** (Playwright): `/` → `/dashboard` → `/profile`
+  redirect chain; sign-in/sign-up/forgot-password forms render; all doc pages
+  render; 404 page works; admin/repository routes redirect to `/profile` when
+  logged out; a bad-credential sign-in hits Supabase and shows the
+  "Invalid login credentials" toast; console clean apart from expected 400s.
+- **Signed-in flows are blocked on credentials, not code.** The user-provided
+  account (`COMRADEAYOMI0166@GMAIL.COM`) returns "Invalid login credentials".
+  Playwright sign-up attempts for a throwaway account
+  (`kba.throwaway.1011@gmail.com` etc.) are rate-limited/rejected by Supabase
+  ("…only request this after 8 seconds.", "Email address … is invalid",
+  "email rate limit exceeded"). Re-test after the Supabase cooldown (rate limits
+  are per-IP/per-email, up to an hour) or with a confirmed account.
+  NOTE: those throwaway credentials were invented for testing and are not real.
+- **Credential-handling security policy added** (`docs/SECURITY.md`): passwords
+  are bcrypt-hashed server-side by Supabase Auth (the app never stores/logs
+  them); emails are stored only in `auth.users` (encrypted at rest) and never in
+  application tables — hashing emails client-side would break login/reset and is
+  intentionally not implemented; tokens are managed by supabase-js (localStorage
+  default accepted for a static SPA, cookie-auth documented as follow-up).
+- **Step 4 remainder:** sign in with a working test account; exercise
+  repository CRUD, Submit-for-Review (degraded state), profile editor, and admin
+  pages; then write `TESTING.md`, final report, and push.
